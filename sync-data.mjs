@@ -1,0 +1,13 @@
+import fs from 'node:fs';import path from 'node:path';import {pathToFileURL} from 'node:url';
+const root=path.resolve(process.argv[2]||'../DungeonCamp-iOS/dist');const here=path.dirname(new URL(import.meta.url).pathname);
+const d=JSON.parse(fs.readFileSync(path.join(root,'data/game.json')));
+const {installCalendar}=await import(pathToFileURL(path.join(root,'services/seasonal.js')));
+const {ContractService}=await import(pathToFileURL(path.join(root,'services/contracts.js')));
+const {GachaService}=await import(pathToFileURL(path.join(root,'services/gacha.js')));
+installCalendar(d,Date.UTC(2026,8,10));const contracts=new ContractService(d),gacha=new GachaService(d);
+const annual=d.seasonalEvents.map(s=>{const e=d.events.find(e=>e.id===s.id+'_2026');return {...s,...e,id:s.id,difficulties:e.difficulties};});
+const jobs=d.contracts.filter(c=>!c.seasonal).map(c=>({...c,quest:contracts.quest(c)}));
+const result={updated:new Date().toISOString().slice(0,10),title:'ダンジョンの入口でキャンプでもしようよ。',config:d.config,characters:d.characters.map(({art,...c},i)=>({...c,portrait:i})),equipment:d.equipment,decorations:d.decorations,events:annual,dungeons:d.story,contracts:jobs,npcs:d.npcProfiles,ranks:d.ranks,campaign:d.campaign,emergency:d.emergency,gacha:d.gacha,seasonalCharacters:d.seasonalCharacters,normalRates:gacha.rates(),notices:d.notices};
+fs.writeFileSync(path.join(here,'wiki-data.js'),'window.WIKI_DATA='+JSON.stringify(result)+';\n');
+fs.writeFileSync(path.join(here,'source-characters.json'),JSON.stringify(d.characters));
+console.log('Wiki data:',result.characters.length,'characters',annual.length,'events',jobs.length,'contracts');
