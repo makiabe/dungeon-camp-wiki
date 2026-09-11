@@ -55,11 +55,51 @@ function guides(page){const content={
 function searchPage(query){const q=query.trim().toLowerCase(),items=[...D.characters.map(c=>({type:'character',id:c.id,title:c.name,kind:'キャラ',text:c.skill+' '+c.skillDescription})),...D.events.map(e=>({type:'event',id:e.id,title:e.boss,kind:'イベント',text:e.theme})),...D.equipment.map(i=>({type:'equipment',id:i.id,title:i.name,kind:'装備',text:i.description})),...D.decorations.map(i=>({type:'equipment',id:i.id,title:i.name,kind:'装飾品',text:i.description})),...D.contracts.map(c=>({type:'contract',id:c.id,title:c.name,kind:'依頼',text:c.description})),...D.dungeons.map(d=>({type:'dungeon',id:d.id,title:d.name,kind:'ダンジョン',text:d.subtitle})),...D.npcs.map(n=>({type:'npc',id:n.id,title:n.name,kind:'NPC',text:n.personality}))];const found=q?items.filter(i=>(i.title+' '+i.text).toLowerCase().includes(q)):[];return `<h1>「${esc(query)}」の検索結果</h1><p class="count">${found.length}件</p><div class="linklist">${found.map(i=>`<a href="#${i.type}/${encodeURIComponent(i.id)}">${tag(i.kind)} <b>${esc(i.title)}</b><p class="note">${esc(i.text||'').slice(0,130)}</p></a>`).join('')||'<p class="empty">キーワードを変えて検索してください。</p>'}</div>`;}
 function missing(){return '<h1>ページが見つかりません</h1><p><a href="#home">トップへ戻る →</a></p>';}
 
+// Editorial comparison model, not simulated combat DPS. Assumptions: three enemies,
+// six allies, average ally HP 240 / ATK 35. CT availability includes SP cost.
+function rankingFeatures(c){
+ const f={attack:c.atk,durability:c.hp*(1+c.def/30),damage:0,healing:0,guard:0,buff:0,debuff:0};
+ const seasonal=!!c.seasonalUltimate;
+ const skills=seasonal?[c.normalSkill,{...c.seasonalUltimate,cost:c.ability?.cost}]:[c.ability||{}];
+ for(const a of skills){
+  const ct=Math.max(1,a.cooldown||12)*(1+(a.cost||0)/20),uptime=Math.min(1,(a.duration||0)/ct);
+  const enemies=a.target==='enemies'||a.scope==='敵全体'?3:1, allies=a.target==='allies'||a.scope==='味方全体'?6:1;
+  const heal=a.heal||(!seasonal&&c.role==='Healer'?a.power:0)||0;
+  const power=!seasonal&&['Healer','Buffer'].includes(c.role)?0:(a.power||0);
+  const damage=c.atk*power*(a.hits||1)*enemies/ct*(1+(a.bossBonus||0)/2+(a.ignoreDefense||0)*.2+(a.sureHit?.05:0));
+  f.damage+=damage+(a.dot?c.atk*.15*(a.dotDuration||0)/ct:0);
+  f.healing+=(c.atk*heal+240*(a.regen||0)*(a.duration||0)/2)*allies/ct+240*(a.revive||0)/ct+damage*(a.lifesteal||0);
+  f.guard+=(a.shield||0)*240*allies/ct+(a.evade||0)*20/ct+(a.taunt?10*uptime:0);
+  for(const [b,n] of [[a.buff,allies],[a.selfBuff,1],[a.partyBuff,6]])if(b){
+   f.buff+=35*n*uptime*((b.attack||0)+(b.speed||0)+(b.critical||0)*.5);
+   f.guard+=20*n*uptime*((b.defense||0)*.5+(b.reduction||0));
+  }
+  if(!seasonal&&c.role==='Buffer')f.buff+=35*6*Math.max(0,(a.power||1)-1)*uptime;
+  if(a.effect==='selfDefense')f.guard+=20*Math.max(0,(a.defenseMultiplier||1)-1)*uptime;
+  const d=a.debuff||{};
+  f.debuff+=35*enemies*uptime*((d.vulnerable||0)+(d.defenseDown||0)*.5+(d.slow||0)+(d.blind||0));
+  f.debuff+=20*enemies*((a.stun||0)*(a.freezeChance??1)+(a.ctDelay||0))/ct;
+  if(!seasonal&&c.role==='Debuffer')f.debuff+=35*enemies*6/ct*.2;
+  if(a.randomDebuff)f.debuff+=35*.2*uptime;
+  if(a.randomBuff)f.buff+=35*allies*.2*uptime;
+  f.buff+=35*allies*(a.ctReduce||0)/ct;
+  if(a.cleanse)f.healing+=10*allies/ct;
+  if(a.resetNormal)f.damage+=c.atk*(c.normalSkill?.power||0)*(c.normalSkill?.hits||1)/ct;
+  if(a.killRefund)f.damage+=damage*a.killRefund*.25;
+ }
+ return f;
+}
+function rankCharacters(characters,role){
+ const weights={Attacker:{attack:.25,damage:.55,durability:.1,guard:.05,debuff:.05},Sorcerer:{attack:.2,damage:.55,debuff:.15,durability:.1},Tank:{durability:.35,guard:.4,debuff:.1,damage:.1,healing:.05},Healer:{healing:.6,durability:.15,buff:.15,guard:.1},Buffer:{buff:.55,healing:.15,guard:.15,durability:.15},Debuffer:{debuff:.55,damage:.25,durability:.1,attack:.1}}[role];
+ const entries=characters.filter(c=>c.role===role).map(c=>({c,f:rankingFeatures(c)}));
+ const maxima=Object.fromEntries(Object.keys(weights).map(k=>[k,Math.max(1,...entries.map(e=>e.f[k]))]));
+ return entries.map(({c,f})=>({...c,rankingScore:Math.round(10000*Object.entries(weights).reduce((sum,[k,w])=>sum+w*f[k]/maxima[k],0))/100})).sort((a,b)=>b.rankingScore-a.rankingScore||a.id.localeCompare(b.id));
+}
+
 function rankingPage(selected='Attacker'){
- const role=roles[selected]?selected:'Attacker',tank=role==='Tank',support=['Healer','Buffer','Debuffer'].includes(role);
- const key=tank||support?'hp':'atk',label=key==='hp'?'初期HP':'初期攻撃力';
- const list=D.characters.filter(c=>c.role===role).sort((a,b)=>b[key]-a[key]||b.def-a.def||a.id.localeCompare(b.id));
- return `<span class="eyebrow">ROLE RANKINGS</span><h1>${roles[role]}ランキング</h1><p>同じ役割の仲間を、育成前の基礎能力で比較できます。キャラを選ぶとスキルや入手方法を確認できます。</p><div class="filterbar">${Object.entries(roles).map(([id,name])=>`<a class="button" href="#rankings/${id}" ${id===role?'aria-current="page"':''}>${name}</a>`).join('')}</div><section class="panel"><h2>評価基準：${label}</h2><p>Lv1・装備なしの${label}が高い順。同値は同順位で表示します。${tank?'タンクの耐久を比較する入口として、HPと防御力を併記しています。':support?'支援役が場に残りやすいかを考えるためのHP比較です。回復量・支援効果の優劣を示す順位ではありません。':'通常攻撃の基礎となる攻撃力を比較しています。'}</p><p class="note">総合的な最強ランキングではありません。属性相性・スキルの対象やCT・装備・編成によって実戦での有用性は変わります。限定キャラと常設キャラを含みます。</p></section><div class="grid">${list.map((c,i)=>{const rank=list.findIndex(x=>x[key]===c[key])+1;return `<article class="card"><div class="card-body"><span class="badge">${rank}位 · ${label} ${c[key]}</span></div><a href="#character/${c.id}"><div class="portrait-wrap">${portrait(c)}</div><div class="card-body"><h2>${esc(c.name)}</h2><p>${el(c.el)} · ${'★'.repeat(c.rarity)} · ${c.eventOnly?'限定':'常設'}</p><p>HP ${c.hp} / 攻撃 ${c.atk} / 防御 ${c.def}</p><h3>${esc(c.normalSkill?.name||c.skill)}</h3><p>${esc(c.normalSkill?.description||c.skillDescription||c.ability?.scope||'詳しいスキルはキャラページへ')}</p><p class="note">${esc(skillPower(c,c.normalSkill||c.ability||{},!!c.normalSkill))}</p></div></a></article>`}).join('')}</div>`;
+ const role=roles[selected]?selected:'Attacker';
+ const list=rankCharacters(D.characters,role);
+ return `<span class="eyebrow">ROLE RANKINGS</span><h1>${roles[role]}ランキング</h1><p>同じ役割の仲間を、スキル構成や育成前の基礎能力で比較できます。キャラを選ぶとスキルや入手方法を確認できます。</p><div class="filterbar">${Object.entries(roles).map(([id,name])=>`<a class="button" href="#rankings/${id}" ${id===role?'aria-current="page"':''}>${name}</a>`).join('')}</div><section class="panel"><h2>評価基準：</h2><p>スキル構成やLv1・装備なしの初期攻撃力の高さなどの総合値で判断しています。</p><p class="note">役割別の重み付けによるWiki独自の参考評価です。実戦の勝率を測定したものではありません。属性相性・スキルの対象やCT・装備・編成によって実戦での有用性は変わります。限定キャラと常設キャラを含みます。</p></section><div class="grid">${list.map((c,i)=>{const rank=list.findIndex(x=>x.rankingScore===c.rankingScore)+1;return `<article class="card"><div class="card-body"><span class="badge">${rank}位</span></div><a href="#character/${c.id}"><div class="portrait-wrap">${portrait(c)}</div><div class="card-body"><h2>${esc(c.name)}</h2><p>${el(c.el)} · ${'★'.repeat(c.rarity)} · ${c.eventOnly?'限定':'常設'}</p><p>HP ${c.hp} / 攻撃 ${c.atk} / 防御 ${c.def}</p><h3>${esc(c.normalSkill?.name||c.skill)}</h3><p>${esc(c.normalSkill?.description||c.skillDescription||c.ability?.scope||'詳しいスキルはキャラページへ')}</p><p class="note">${esc(skillPower(c,c.normalSkill||c.ability||{},!!c.normalSkill))}</p></div></a></article>`}).join('')}</div>`;
 }
 
 function render(){let [page='home',...parts]=location.hash.slice(1).split('/');page||='home';let id;try{id=decodeURIComponent(parts.join('/'));}catch{id='';}const parent={character:'characters',event:'events',dungeon:'dungeons',contract:'contracts',npc:'npcs'}[page]||page;$('#navigation').innerHTML=navigation.map(([p,i,n])=>`<a href="#${p}" ${p===parent?'aria-current="page"':''}>${i}　${n}</a>`).join('');const views={home,rankings:()=>rankingPage(id),characters,character:()=>characterPage(id),events,event:()=>eventPage(id),dungeons,dungeon:()=>dungeonPage(id),contracts:contractsPage,contract:()=>contractPage(id),equipment:()=>equipmentPage(id),gacha:gachaPage,npcs:()=>npcPage(),npc:()=>npcPage(id),search:()=>searchPage(id)};try{$('#main').innerHTML=views[page]?views[page]():guides(page);}catch(error){console.error(error);$('#main').innerHTML='<h1>ページの読み込みに失敗しました</h1><a href="#home">トップへ戻る</a>';}document.title=($('#main h1')?.textContent||'トップ')+' | ダンジョンの入口でキャンプでもしようよ。攻略Wiki';if(page==='characters'){document.querySelectorAll('.filterbar input,.filterbar select').forEach(e=>e.addEventListener('input',filterCharacters));filterCharacters();}if(page==='contracts'){document.querySelectorAll('.filterbar input,.filterbar select').forEach(e=>e.addEventListener('input',filterJobs));filterJobs();}if(page==='equipment'&&!id){document.querySelectorAll('.filterbar input,.filterbar select').forEach(e=>e.addEventListener('input',filterItems));filterItems();}updateClocks();window.scrollTo(0,0);}
