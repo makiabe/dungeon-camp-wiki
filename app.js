@@ -75,6 +75,7 @@ function rankingFeatures(c){
    f.guard+=20*n*uptime*((b.defense||0)*.5+(b.reduction||0));
   }
   if(!seasonal&&c.role==='Buffer')f.buff+=35*6*Math.max(0,(a.power||1)-1)*uptime;
+  if(a.selfRegen)f.healing+=c.hp*a.selfRegen*(a.selfRegenDuration/2)/ct;
   if(a.effect==='selfDefense')f.guard+=20*Math.max(0,(a.defenseMultiplier||1)-1)*uptime;
   const d=a.debuff||{};
   f.debuff+=35*enemies*uptime*((d.vulnerable||0)+(d.defenseDown||0)*.5+(d.slow||0)+(d.blind||0));
