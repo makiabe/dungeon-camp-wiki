@@ -89,6 +89,8 @@
     const url = new URL(href, location.href); url.searchParams.set('lang', lang); return url;
   }
   function sync() {
+    const status = document.querySelector(".language-status");
+    if (status) status.textContent = language === "en" ? "In preparation" : "準備中";
     document.documentElement.lang = language;
     document.querySelectorAll('[data-language-switch] a').forEach(link => {
       const lang = link.dataset.language;
@@ -118,7 +120,7 @@
     const nav = document.createElement('nav');
     nav.className = 'language-switch'; nav.dataset.languageSwitch = '';
     nav.setAttribute('aria-label', 'Language / 言語');
-    nav.innerHTML = '<a data-language="ja" lang="ja" hreflang="ja">日本語</a><a data-language="en" lang="en" hreflang="en">English</a>';
+    nav.innerHTML = '<a data-language="ja" lang="ja" hreflang="ja">日本語</a><a data-language="en" lang="en" hreflang="en">English</a><small class="language-status">準備中</small>';
     nav.addEventListener('click', event => {
       const link = event.target.closest('a[data-language]');
       if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;

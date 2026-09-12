@@ -20,3 +20,5 @@ body{padding-top:66px}html{scroll-padding-top:76px}html[lang=en] .brand{line-hei
 .poko-guide-portrait{display:flex;justify-content:center;max-width:240px;padding:12px;margin:16px 0;background:#edf1e8;border:1px solid var(--line);border-radius:12px}.poko-guide-portrait .portrait{flex:none}
 
 .guide-campfire{display:block;width:50%;height:auto;margin:24px 0;border-radius:12px}.poko-guide-heading{padding-top:20px}
+
+.language-status{position:absolute;top:calc(100% + 4px);right:0;left:0;text-align:center;font:400 11px/1.5 system-ui;color:#526760;background:#f6f4ed;border-radius:6px;padding:1px 4px;white-space:nowrap}body{padding-top:88px}html{scroll-padding-top:98px}
