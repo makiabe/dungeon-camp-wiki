@@ -20,6 +20,13 @@
     if (translated !== undefined) return source.replace(trimmed, translated);
     // Numeric labels need templates: exact dictionary entries cannot cover every value.
     const patterns = [
+      [/^(\d+)人の仲間を、属性・役割・レア度から探す。数値は初期基礎値です。$/, m=>`Browse ${m[1]} companions by element, role and rarity. Stats are starting base values.`],
+      [/^(\d+)人 \/ 全(\d+)人$/, m=>`${m[1]} / ${m[2]} companions`],
+      [/^([FEDCBAS])ランク$/, m=>`Rank ${m[1]}`],
+      [/^(\d+)月(\d+)日〜(\d+)月(\d+)日$/, m=>`${m[1]}/${m[2]}–${m[3]}/${m[4]}`],
+      [/^(\d+)月(.+)に開催（JST）。ボスイベントの3期制とは別の日程です。$/, m=>`${text(m[1]+'月'+m[2])} (JST). This schedule is separate from the three boss-event periods.`],
+      [/^1回につき星の石(\d+)個。石は30分で1個チャージ、所持上限なし。最初のチュートリアル10連召喚はチュートリアルで受け取れます。$/,m=>`Each summon costs ${m[1]} Star Stone(s). One stone charges every 30 minutes with no storage limit. Your first tutorial ten-pull is provided during the tutorial.`],
+      [/^ピックアップ対象は★5枠の([\d.]+)%を占めます。対象キャラの1回あたり排出率は([\d.]+)%（★5対象が複数いる場合）。残りは同レア度の対象キャラへ均等に配分されます。$/,m=>`The featured companion takes ${m[1]}% of the ★5 pool, giving a ${m[2]}% chance per summon when multiple ★5 companions are eligible. The remaining chance is shared equally among other eligible companions of the same rarity.`],
       [/^([\d.]+|—)秒$/, m => `${m[1]} s`],
       [/^効果時間：([\d.]+)秒$/, m => `Duration: ${m[1]} s`],
       [/^回復量：攻撃力 ×([\d.]+)(?:〜([\d.]+)（発動ごとにランダム）)?$/, m => `Healing: ATK ×${m[1]}${m[2] ? `–${m[2]} (random per cast)` : ''}`],
