@@ -180,3 +180,5 @@ Object.assign(window.WIKI_EN, {"魂の剣": "Soul Sword", "桜花の鎧": "Cherr
 Object.assign(window.WIKI_EN, {"装備のドロップはありません。": "No equipment drops.", "旅立ちを助ける、旅人の剣・鎧・護符が眠っている。": "Traveler’s swords, armor and charms await to help you start your journey.", "紅葉の剣・鎧・護符が見つかる。簡単では、基本能力に加えて最大HP＋3の装備スキルを持つ。": "Find Autumn Leaf swords, armor and charms. On Easy, their equipment skill grants +3 maximum HP in addition to base stats.", "紅葉の剣・鎧・護符が見つかる。普通では、基本能力に加えて最大HP＋5の装備スキルを持つ。": "Find Autumn Leaf swords, armor and charms. On Normal, their equipment skill grants +5 maximum HP in addition to base stats.", "紅葉の剣・鎧・護符が見つかる。激ムズでは、基本能力に加えて最大HP＋10の装備スキルを持つ。": "Find Autumn Leaf swords, armor and charms. On Extreme, their equipment skill grants +10 maximum HP in addition to base stats."});
 
 Object.assign(window.WIKI_EN, {"召喚で使用する星の石について": "Star Stones used for summoning"});
+
+Object.assign(window.WIKI_EN, {"詳細を見る →": "View details →"});
