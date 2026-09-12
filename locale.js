@@ -20,6 +20,17 @@
     if (translated !== undefined) return source.replace(trimmed, translated);
     // Numeric labels need templates: exact dictionary entries cannot cover every value.
     const patterns = [
+      [/^秋の10層ダンジョン・ランク ([FEDCBAS])$/,m=>`Autumn 10-floor dungeon — Rank ${m[1]}`],
+      [/^(.+)討伐・([FEDCBAS])ランク$/,m=>`Hunt: ${text(m[1])} — Rank ${m[2]}`],
+      [/^(.+)・([FEDCBAS])$/,m=>`${text(m[1])} — ${m[2]}`],
+      [/^\/ (.+)$/,m=>`/ ${text(m[1])}`],
+      [/^(.+)【ボス】$/,m=>`${text(m[1])} [Boss]`],
+      [/^(.+)：([\d,]+)$/,m=>`${text(m[1])}: ${m[2]}`],
+      [/^(.+) · (.+)$/,m=>`${text(m[1])} · ${text(m[2])}`],
+      [/^スタミナ (\d+)$/,m=>`Stamina ${m[1]}`],
+      [/^([\d.]+)〜([\d.]+)秒$/,m=>`${m[1]}–${m[2]} s`],
+      [/^攻略の提案：前衛の耐久と全体攻撃後の立て直しを優先し、(.+)属性の攻撃役を添えましょう。単独は高難度のため、育成が足りない場合は$/,m=>`Strategy: prioritize front-line durability and recovery after all-target attacks, and add ${text(m[1])}-element damage dealers. Solo challenges are difficult; if your party needs more training, use an `],
+      [/^目安戦力 ([\d,]+)。5階層以降は敵スキルが追加されます。ボス属性と前衛の耐久を確認しましょう。$/,m=>`Recommended power: ${m[1]}. Enemy skills appear from floor 5 onward. Check boss elements and front-line durability.`],
       [/^(\d+)人の仲間を、属性・役割・レア度から探す。数値は初期基礎値です。$/, m=>`Browse ${m[1]} companions by element, role and rarity. Stats are starting base values.`],
       [/^(\d+)人 \/ 全(\d+)人$/, m=>`${m[1]} / ${m[2]} companions`],
       [/^([FEDCBAS])ランク$/, m=>`Rank ${m[1]}`],
