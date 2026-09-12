@@ -18,6 +18,24 @@
     const source = String(value), trimmed = source.trim();
     const translated = global.WIKI_EN?.[trimmed];
     if (translated !== undefined) return source.replace(trimmed, translated);
+    // Numeric labels need templates: exact dictionary entries cannot cover every value.
+    const patterns = [
+      [/^(\d+)位$/, m => `#${m[1]}`],
+      [/^(\d+)人の図鑑 →$/, m => `${m[1]} companions →`],
+      [/^年間(\d+)イベント →$/, m => `${m[1]} annual events →`],
+      [/^(\d+)月(\d+)〜(\d+)日$/, m => `${m[1]}/${m[2]}–${m[1]}/${m[3]}`],
+      [/^(\d+)月(\d+)日〜月末$/, m => `${m[1]}/${m[2]}–month end`],
+      [/^HP ([\d.,]+) \/ 攻撃 ([\d.,]+) \/ 防御 ([\d.,]+)$/, m => `HP ${m[1]} / ATK ${m[2]} / DEF ${m[3]}`],
+      [/^攻撃力 ×([\d.]+)$/, m => `ATK ×${m[1]}`],
+      [/^攻撃力 ×([\d.]+) ×(\d+)回（合計([\d.]+)倍）$/, m => `ATK ×${m[1]} ×${m[2]} hits (${m[3]}× total)`],
+      [/^· (★+) · (限定|常設)$/, m => `· ${m[1]} · ${m[2] === '限定' ? 'Limited' : 'Permanent'}`],
+      [/^木曜0:00更新 \/ (.+)まで$/, m => `Updates Thursday at 00:00 JST / until ${m[1]}`]
+    ];
+    for (const [pattern, render] of patterns) {
+      const match = trimmed.match(pattern);
+      if (match) return source.replace(trimmed, render(match));
+    }
+
     if (/[\u3040-\u30ff\u3400-\u9fff]/.test(trimmed)) missing.add(trimmed);
     return source;
   }
@@ -59,7 +77,7 @@
     document.querySelectorAll('a[href]').forEach(link => {
       if (link.closest('[data-language-switch]')) return;
       const url = new URL(link.getAttribute('href'), location.href);
-      if (url.origin === location.origin && /(?:\/|\/index\.html|\/support\.html|\/privacy\.html)$/.test(url.pathname)) {
+      if (url.origin === location.origin && /(?:\/|\/index\.html|\/support\.html|\/privacy\.html|\/faq\.html)$/.test(url.pathname)) {
         url.searchParams.set('lang', language); link.href = url.href;
       }
     });
