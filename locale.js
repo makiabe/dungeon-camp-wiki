@@ -20,6 +20,20 @@
     if (translated !== undefined) return source.replace(trimmed, translated);
     // Numeric labels need templates: exact dictionary entries cannot cover every value.
     const patterns = [
+      [/^([\d.]+|—)秒$/, m => `${m[1]} s`],
+      [/^効果時間：([\d.]+)秒$/, m => `Duration: ${m[1]} s`],
+      [/^回復量：攻撃力 ×([\d.]+)(?:〜([\d.]+)（発動ごとにランダム）)?$/, m => `Healing: ATK ×${m[1]}${m[2] ? `–${m[2]} (random per cast)` : ''}`],
+      [/^被ダメージ ([\d.]+)%軽減$/, m => `Damage taken reduced by ${m[1]}%`],
+      [/^攻撃間隔 ×([\d.]+)$/, m => `Attack interval ×${m[1]}`],
+      [/^(与ダメージ|敵の被ダメージ) ×([\d.]+)$/, m => `${m[1]==='与ダメージ'?'Damage dealt':'Enemy damage taken'} ×${m[2]}`],
+      [/^最大HPの([\d.]+)%を([\d.]+)秒ごとに回復$/, m => `Restore ${m[1]}% max HP every ${m[2]} s`],
+      [/^攻撃力 ×([\d.]+) \/ ([\d.]+)秒ごと$/, m => `ATK ×${m[1]} every ${m[2]} s`],
+      [/^シールド：最大HPの([\d.]+)%$/, m => `Shield: ${m[1]}% max HP`],
+      [/^継続回復：最大HPの([\d.]+)% \/ ([\d.]+)秒$/, m => `Regeneration: ${m[1]}% max HP / ${m[2]} s`],
+      [/^最大HPの([\d.]+)%で復活$/, m => `Revive with ${m[1]}% max HP`],
+      [/^ボスへのダメージ \+([\d.]+)%$/, m => `Damage to bosses +${m[1]}%`],
+      [/^· (.+)$/, m => `· ${global.WIKI_EN?.[m[1]] || m[1]}`],
+
       [/^(\d+)位$/, m => `#${m[1]}`],
       [/^(\d+)人の図鑑 →$/, m => `${m[1]} companions →`],
       [/^年間(\d+)イベント →$/, m => `${m[1]} annual events →`],
