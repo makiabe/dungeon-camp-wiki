@@ -14,3 +14,5 @@ body{padding-top:66px}html{scroll-padding-top:76px}html[lang=en] .brand{line-hei
 .faq-item>p{margin:0 0 16px;padding:0 4px;line-height:1.95;overflow-wrap:anywhere}
 .faq-item>p:last-child{margin-bottom:0}
 @media(max-width:600px){.faq-item{margin-bottom:30px}.faq-item>h2{padding:12px 15px;margin-bottom:16px}.faq-item>p{padding:0 2px}}
+
+.faq-home{display:block;margin:0 0 20px}.faq-home a{display:inline-block;padding:8px 14px;border:1px solid var(--line);border-radius:6px;background:#fffef9;font-weight:600}
