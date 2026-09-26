@@ -137,7 +137,16 @@
       if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault(); select(link.dataset.language);
     });
-    document.body.append(nav);
+    const download = document.querySelector('.download-banner');
+    if (download) {
+      const toolbar = document.createElement('div');
+      toolbar.className = 'site-toolbar';
+      toolbar.append(download, nav);
+      document.body.prepend(toolbar);
+      document.body.classList.add('has-site-toolbar');
+    } else {
+      document.body.append(nav);
+    }
     history.replaceState(history.state, '', urlFor(language));
     translate(document.body); sync();
   });

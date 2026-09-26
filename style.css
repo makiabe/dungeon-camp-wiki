@@ -24,3 +24,10 @@ body{padding-top:66px}html{scroll-padding-top:76px}html[lang=en] .brand{line-hei
 .language-status{position:absolute;top:calc(100% + 4px);right:0;left:0;text-align:center;font:400 11px/1.5 system-ui;color:#526760;background:#f6f4ed;border-radius:6px;padding:1px 4px;white-space:nowrap}body{padding-top:88px}html{scroll-padding-top:98px}
 
 .download-banner{max-width:1380px;margin:0 auto;padding:20px 24px 0;text-align:center}
+
+body.has-site-toolbar{padding-top:0}
+.site-toolbar{display:flex;align-items:flex-start;justify-content:flex-end;flex-wrap:wrap;gap:24px;max-width:1380px;margin:0 auto;padding:20px 24px 34px}
+.site-toolbar .download-banner{margin:0;padding:0;max-width:none}
+.site-toolbar .download-banner .button{display:flex;align-items:center;justify-content:center;min-height:52px;padding:14px 24px;border-radius:999px;line-height:1.5}
+.site-toolbar .language-switch{position:relative;top:auto;right:auto;flex-shrink:0;overflow:visible}
+@media(max-width:480px){.site-toolbar{justify-content:center;gap:16px;padding:20px 18px 34px}.site-toolbar .download-banner{flex-basis:100%}.site-toolbar .download-banner .button{width:fit-content;margin:auto}}
