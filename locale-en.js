@@ -182,3 +182,5 @@ Object.assign(window.WIKI_EN, {"装備のドロップはありません。": "No
 Object.assign(window.WIKI_EN, {"召喚で使用する星の石について": "Star Stones used for summoning"});
 
 Object.assign(window.WIKI_EN, {"詳細を見る →": "View details →"});
+
+Object.assign(window.WIKI_EN, {"AppStoreからダウンロード": "Download on the App Store"});
