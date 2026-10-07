@@ -72,7 +72,7 @@
     return source;
   }
   function translate(root) {
-    if (!root) return;
+    if (!root || language === 'ja' && !global.WIKI_EN) return;
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     let node;
     while ((node = walker.nextNode())) {
@@ -116,8 +116,11 @@
       }
     });
   }
-  function select(lang) {
+  async function select(lang) {
     if (!valid(lang)) return;
+    if (lang === 'en' && global.WikiEnglish) {
+      try { await global.WikiEnglish.ensure(); } catch (error) { console.error(error); return; }
+    }
     language = lang;
     try { localStorage.setItem(key, lang); } catch {}
     history.replaceState(history.state, '', urlFor(lang));

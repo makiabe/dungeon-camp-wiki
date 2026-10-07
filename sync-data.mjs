@@ -11,3 +11,5 @@ const result={updated:new Date().toISOString().slice(0,10),title:'ダンジョ�
 fs.writeFileSync(path.join(here,'wiki-data.js'),'window.WIKI_DATA='+JSON.stringify(result).replaceAll('アステル','主人公')+';\n');
 fs.writeFileSync(path.join(here,'source-characters.json'),JSON.stringify(d.characters));
 console.log('Wiki data:',result.characters.length,'characters',annual.length,'events',jobs.length,'contracts');
+
+await import('./optimize-data.mjs');

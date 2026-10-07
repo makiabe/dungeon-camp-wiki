@@ -16,6 +16,13 @@ for i,c in enumerate(chars):
  if bbox:crop=crop.crop(bbox)
  crop.thumbnail((166,172));sheet.alpha_composite(crop,(i%12*192+(192-crop.width)//2,i//12*192+182-crop.height))
 sheet.save(out/'portraits.webp',quality=90)
+# Split the exported atlas losslessly so only visible portraits need downloading.
+exported=Image.open(out/'portraits.webp')
+(out/'portraits').mkdir(exist_ok=True)
+for i in range(len(chars)):
+ x=i%12*192;y=i//12*192
+ exported.crop((x,y,x+192,y+192)).save(out/'portraits'/f'{i}.webp',lossless=True)
+
 for p in (root/'assets/events').glob('*.png'):
  im=Image.open(p).convert('RGB');im.thumbnail((1000,563));im.save(out/(p.stem+'.webp'),quality=82)
 for p in root.glob('assets/dungeon-*.png'):
