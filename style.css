@@ -31,3 +31,12 @@ body.has-site-toolbar{padding-top:0}
 .site-toolbar .download-banner .button{display:flex;align-items:center;justify-content:center;min-height:52px;padding:14px 24px;border-radius:999px;line-height:1.5}
 .site-toolbar .language-switch{position:relative;top:auto;right:auto;flex-shrink:0;overflow:visible}
 @media(max-width:480px){.site-toolbar{justify-content:center;gap:16px;padding:20px 18px 34px}.site-toolbar .download-banner{flex-basis:100%}.site-toolbar .download-banner .button{width:fit-content;margin:auto}}
+
+/* Place mobile actions after the page content, without covering it. */
+@media(max-width:850px){
+  body{padding-top:0}
+  .language-switch a:not([aria-current=true]){background:transparent}
+  html{scroll-padding-top:10px}
+  .site-toolbar{justify-content:center;width:100%;padding-bottom:calc(34px + env(safe-area-inset-bottom))}
+  body>.language-switch{position:relative;top:auto;right:auto;width:fit-content;margin:24px auto 40px;overflow:visible}
+}

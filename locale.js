@@ -145,7 +145,13 @@
       const toolbar = document.createElement('div');
       toolbar.className = 'site-toolbar';
       toolbar.append(download, nav);
-      document.body.prepend(toolbar);
+      const mobileLayout = global.matchMedia('(max-width:850px)');
+      const placeToolbar = () => {
+        if (mobileLayout.matches) document.body.append(toolbar);
+        else document.body.prepend(toolbar);
+      };
+      placeToolbar();
+      mobileLayout.addEventListener('change', placeToolbar);
       document.body.classList.add('has-site-toolbar');
     } else {
       document.body.append(nav);

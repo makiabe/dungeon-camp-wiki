@@ -6,3 +6,12 @@ body{padding-top:66px}html{scroll-padding-top:76px}html[lang=en] .brand{line-hei
 @media(max-width:480px){.language-switch{right:.5rem}.language-switch a{padding:0 12px}}
 
 .language-status{position:absolute;top:calc(100% + 4px);right:0;left:0;text-align:center;font:400 11px/1.5 system-ui;color:#526760;background:#f6f4ed;border-radius:6px;padding:1px 4px;white-space:nowrap}body{padding-top:88px}html{scroll-padding-top:98px}
+
+/* Place mobile actions after the page content, without covering it. */
+@media(max-width:850px){
+  body{padding-top:0}
+  .language-switch a:not([aria-current=true]){background:transparent}
+  html{scroll-padding-top:10px}
+  .site-toolbar{justify-content:center;width:100%;padding-bottom:calc(34px + env(safe-area-inset-bottom))}
+  body>.language-switch{position:relative;top:auto;right:auto;width:fit-content;margin:24px auto 40px;overflow:visible}
+}
