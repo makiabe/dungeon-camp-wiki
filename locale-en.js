@@ -1,5 +1,7 @@
 // Reviewed interface translations. Untranslated content retains its Japanese source.
 window.WIKI_EN = {
+  '開発者からのお知らせ':'Developer announcements',
+  'Xで開発・改善状況についてポストしています。':'I post development and improvement updates on X.',
   'トップ':'Home','本文へ':'Skip to content','キャラクター':'Characters','キャラランキング':'Character rankings',
   '初心者ガイド':'Getting started','イベント・ボス攻略':'Events & bosses','召喚・スケジュール':'Summoning & schedule',
   'ダンジョン':'Dungeons','酒場・依頼':'Tavern & quests','パーティランク':'Party rank','パーティ育成':'Party growth',
