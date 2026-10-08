@@ -186,3 +186,5 @@ Object.assign(window.WIKI_EN, {"召喚で使用する星の石について": "St
 Object.assign(window.WIKI_EN, {"詳細を見る →": "View details →"});
 
 Object.assign(window.WIKI_EN, {"AppStoreからダウンロード": "Download on the App Store"});
+
+Object.assign(window.WIKI_EN, {'お知らせ':'News'});

@@ -7,7 +7,7 @@
       if (window.WIKI_EN) return Promise.resolve();
       if (!ready) ready = new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = new URL('locale-en.js?v=20261008-notice', url).href;
+        script.src = new URL('locale-en.js?v=9526d8cb48f2-notice', url).href;
         script.onload = resolve;
         script.onerror = () => { script.remove(); ready = null; reject(new Error('English dictionary unavailable')); };
         document.head.append(script);
